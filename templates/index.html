@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Check an email for common phishing warning signs.">
+  <title>Phishing Email Checker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="page">
+    <header class="intro">
+      <p class="eyebrow">EMAIL SAFETY TOOL</p>
+      <h1>Phishing email checker</h1>
+      <p>Review an email for common warning signs before you click, reply, or share information.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="form-title">
+      <h2 id="form-title">Check a message</h2>
+      <p class="hint">Your message is checked locally by this app and is not saved or sent anywhere.</p>
+      {% if error %}
+        <p class="error" role="alert">{{ error }}</p>
+      {% endif %}
+      <form method="post">
+        <label for="subject">Subject <span>(optional)</span></label>
+        <input id="subject" name="subject" type="text" maxlength="200"
+               value="{{ subject or '' }}" placeholder="Email subject">
+
+        <label for="sender">Sender address <span>(optional)</span></label>
+        <input id="sender" name="sender" type="text" maxlength="320"
+               value="{{ sender or '' }}" placeholder="name@example.com">
+
+        <label for="body">Email message</label>
+        <textarea id="body" name="body" maxlength="20000" required
+                  placeholder="Paste the email text here">{{ body or '' }}</textarea>
+        <button type="submit">Check email</button>
+      </form>
+    </section>
+
+    {% if result %}
+      <section class="panel result" aria-labelledby="result-title">
+        <div class="result-heading">
+          <div>
+            <p class="eyebrow">ASSESSMENT</p>
+            <h2 id="result-title">{{ result.risk }} risk</h2>
+          </div>
+          <p class="score"><strong>{{ result.score }}</strong><span>/ 100</span></p>
+        </div>
+        <p class="disclaimer">
+          This score is based on a few common patterns, not a definitive verdict.
+          A low score does not prove that an email is safe.
+        </p>
+        {% if result.findings %}
+          <h3>Warning signs found</h3>
+          <ul class="findings">
+            {% for finding in result.findings %}
+              <li>
+                <strong>{{ finding.title }}</strong>
+                <span>{{ finding.detail }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-findings">No warning signs from this checker were found. Stay cautious with unexpected messages.</p>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    <footer>
+      <p>Never open unexpected attachments or enter passwords through links in unsolicited messages.
+        When in doubt, contact the organization using a trusted website or phone number.</p>
+    </footer>
+  </main>
+</body>
+</html>
